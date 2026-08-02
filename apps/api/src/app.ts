@@ -5,6 +5,9 @@ import express, {
   type Response,
 } from "express";
 
+import { prisma } from "./lib/prisma.js";
+import { vehiclesRouter } from "./routes/vehicles.routes.js";
+
 export const app = express();
 
 app.disable("x-powered-by");
@@ -17,6 +20,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use("/api/vehicles", vehiclesRouter);
 
 app.get("/", (_request: Request, response: Response) => {
   response.status(200).json({
@@ -33,6 +38,23 @@ app.get("/health", (_request: Request, response: Response) => {
     uptimeSeconds: Math.floor(process.uptime()),
   });
 });
+
+app.get(
+  "/health/database",
+  async (_request: Request, response: Response, next: NextFunction) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+
+      response.status(200).json({
+        status: "ok",
+        service: "postgresql",
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 app.use((_request: Request, response: Response) => {
   response.status(404).json({
