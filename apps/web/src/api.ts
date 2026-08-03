@@ -1,12 +1,17 @@
-import type { VehiclesResponse } from "./types";
+﻿import type {
+  LatestTelemetryResponse,
+  TelemetryHistoryResponse,
+  VehiclesResponse,
+} from "./types";
 
 const apiUrl =
   import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-export async function fetchVehicles(
+async function requestJson<T>(
+  path: string,
   signal?: AbortSignal,
-): Promise<VehiclesResponse> {
-  const response = await fetch(`${apiUrl}/api/vehicles`, {
+): Promise<T> {
+  const response = await fetch(`${apiUrl}${path}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -15,10 +20,49 @@ export async function fetchVehicles(
   });
 
   if (!response.ok) {
+    const errorBody = (await response
+      .json()
+      .catch(() => null)) as { error?: string } | null;
+
     throw new Error(
-      `Failed to load vehicles. Server returned ${response.status}.`,
+      errorBody?.error ??
+        `Request failed with status ${response.status}.`,
     );
   }
 
-  return (await response.json()) as VehiclesResponse;
+  return (await response.json()) as T;
+}
+
+export function fetchVehicles(
+  signal?: AbortSignal,
+): Promise<VehiclesResponse> {
+  return requestJson<VehiclesResponse>(
+    "/api/vehicles",
+    signal,
+  );
+}
+
+export function fetchLatestTelemetry(
+  vehicleId: string,
+  signal?: AbortSignal,
+): Promise<LatestTelemetryResponse> {
+  return requestJson<LatestTelemetryResponse>(
+    `/api/vehicles/${vehicleId}/telemetry/latest`,
+    signal,
+  );
+}
+
+export function fetchTelemetryHistory(
+  vehicleId: string,
+  limit = 50,
+  signal?: AbortSignal,
+): Promise<TelemetryHistoryResponse> {
+  const query = new URLSearchParams({
+    limit: String(limit),
+  });
+
+  return requestJson<TelemetryHistoryResponse>(
+    `/api/vehicles/${vehicleId}/telemetry/history?${query}`,
+    signal,
+  );
 }
