@@ -1,4 +1,6 @@
-import "dotenv/config";
+﻿import "dotenv/config";
+
+import { createServer } from "node:http";
 
 import { app } from "./app.js";
 import { prisma } from "./lib/prisma.js";
@@ -6,17 +8,32 @@ import {
   startMqttClient,
   stopMqttClient,
 } from "./mqtt/mqtt.client.js";
+import {
+  startSocketServer,
+  stopSocketServer,
+} from "./realtime/socket.server.js";
 
 const portValue = Number(process.env.PORT ?? 3000);
 
-if (!Number.isInteger(portValue) || portValue <= 0 || portValue > 65_535) {
-  throw new Error("PORT must be a valid integer between 1 and 65535.");
+if (
+  !Number.isInteger(portValue) ||
+  portValue <= 0 ||
+  portValue > 65_535
+) {
+  throw new Error(
+    "PORT must be a valid integer between 1 and 65535.",
+  );
 }
 
+const httpServer = createServer(app);
+
+startSocketServer(httpServer);
 startMqttClient();
 
-const server = app.listen(portValue, () => {
-  console.log(`DrivePulse API running at http://localhost:${portValue}`);
+httpServer.listen(portValue, () => {
+  console.log(
+    `DrivePulse API running at http://localhost:${portValue}`,
+  );
 });
 
 let isShuttingDown = false;
@@ -30,7 +47,7 @@ async function shutDown(signal: string): Promise<void> {
 
   console.log(`\nReceived ${signal}. Shutting down...`);
 
-  server.close(async (error) => {
+  httpServer.close(async (error) => {
     if (error) {
       console.error("Failed to close the HTTP server:", error);
       process.exit(1);
@@ -38,6 +55,7 @@ async function shutDown(signal: string): Promise<void> {
 
     try {
       await stopMqttClient();
+      await stopSocketServer();
       await prisma.$disconnect();
 
       console.log("Database connection closed.");

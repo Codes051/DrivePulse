@@ -1,4 +1,5 @@
-import { prisma } from "../lib/prisma.js";
+﻿import { prisma } from "../lib/prisma.js";
+import { emitTelemetryUpdate } from "../realtime/socket.server.js";
 import type { TelemetryPayload } from "../schemas/telemetry.schema.js";
 
 export async function saveTelemetry(
@@ -20,7 +21,7 @@ export async function saveTelemetry(
     return;
   }
 
-  await prisma.$transaction([
+  const [reading] = await prisma.$transaction([
     prisma.telemetryReading.create({
       data: {
         vehicleId: vehicle.id,
@@ -46,4 +47,24 @@ export async function saveTelemetry(
       },
     }),
   ]);
+
+  emitTelemetryUpdate({
+    id: reading.id.toString(),
+    vehicleId: reading.vehicleId,
+    vehicleCode: payload.vehicleCode,
+    recordedAt: reading.recordedAt.toISOString(),
+    speedKmh: reading.speedKmh,
+    rpm: reading.rpm,
+    temperatureC: reading.temperatureC,
+    batteryVoltage: reading.batteryVoltage,
+    batteryPercentage: reading.batteryPercentage,
+    currentAmps: reading.currentAmps,
+    vibration: reading.vibration,
+    ...(reading.latitude !== null
+      ? { latitude: reading.latitude }
+      : {}),
+    ...(reading.longitude !== null
+      ? { longitude: reading.longitude }
+      : {}),
+  });
 }

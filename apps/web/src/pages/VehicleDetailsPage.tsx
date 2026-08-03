@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import {
   CartesianGrid,
@@ -14,6 +14,7 @@ import {
   fetchLatestTelemetry,
   fetchTelemetryHistory,
 } from "../api";
+import { socket } from "../socket";
 import type {
   LatestTelemetryResponse,
   TelemetryReading,
@@ -24,7 +25,7 @@ function formatNumber(
   digits = 1,
 ): string {
   if (value === null || value === undefined) {
-    return "—";
+    return "\u2014";
   }
 
   return value.toFixed(digits);
@@ -112,6 +113,56 @@ export function VehicleDetailsPage() {
     };
   }, [vehicleId]);
 
+  useEffect(() => {
+    if (!vehicleId) {
+      return;
+    }
+
+    function handleTelemetryUpdate(
+      reading: TelemetryReading,
+    ): void {
+      if (reading.vehicleId !== vehicleId) {
+        return;
+      }
+
+      setLatest((current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          vehicle: {
+            ...current.vehicle,
+            status: "ONLINE",
+          },
+          telemetry: reading,
+        };
+      });
+
+      setHistory((current) => {
+        const withoutDuplicate = current.filter(
+          (existingReading) =>
+            existingReading.id !== reading.id,
+        );
+
+        return [reading, ...withoutDuplicate].slice(0, 60);
+      });
+    }
+
+    socket.connect();
+    socket.emit("vehicle:join", vehicleId);
+    socket.on("telemetry:updated", handleTelemetryUpdate);
+
+    return () => {
+      socket.emit("vehicle:leave", vehicleId);
+      socket.off(
+        "telemetry:updated",
+        handleTelemetryUpdate,
+      );
+      socket.disconnect();
+    };
+  }, [vehicleId]);
   const chartData = useMemo(() => {
     return [...history]
       .reverse()
@@ -126,7 +177,7 @@ export function VehicleDetailsPage() {
     return (
       <main className="details-page">
         <Link className="back-link" to="/">
-          ← Fleet overview
+          {"\u2190"} Fleet overview
         </Link>
 
         <div className="details-state">
@@ -140,7 +191,7 @@ export function VehicleDetailsPage() {
     return (
       <main className="details-page">
         <Link className="back-link" to="/">
-          ← Fleet overview
+          {"\u2190"} Fleet overview
         </Link>
 
         <div className="details-state details-error">
@@ -155,8 +206,8 @@ export function VehicleDetailsPage() {
   return (
     <main className="details-page">
       <Link className="back-link" to="/">
-        ← Fleet overview
-      </Link>
+          {"\u2190"} Fleet overview
+        </Link>
 
       <header className="details-header">
         <div>
@@ -168,12 +219,19 @@ export function VehicleDetailsPage() {
           </p>
         </div>
 
-        <span
-          className={`status-badge status-${latest.vehicle.status.toLowerCase()}`}
-        >
-          <span className="status-dot" />
-          {latest.vehicle.status}
-        </span>
+        <div className="details-status-group">
+          <span className="live-indicator">
+            <span className="live-indicator-dot" />
+            Live telemetry
+          </span>
+
+          <span
+            className={`status-badge status-${latest.vehicle.status.toLowerCase()}`}
+          >
+            <span className="status-dot" />
+            {latest.vehicle.status}
+          </span>
+        </div>
       </header>
 
       {!telemetry ? (
@@ -202,7 +260,7 @@ export function VehicleDetailsPage() {
               <span>Temperature</span>
               <strong>
                 {formatNumber(telemetry.temperatureC)}{" "}
-                <small>°C</small>
+                <small>{"\u00B0C"}</small>
               </strong>
             </article>
 
@@ -313,7 +371,7 @@ export function VehicleDetailsPage() {
                     <YAxis
                       stroke="#718096"
                       tick={{ fontSize: 11 }}
-                      unit=" °C"
+                      unit={"\u00B0C"}
                     />
                     <Tooltip />
                     <Line

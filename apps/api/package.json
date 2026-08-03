@@ -20,6 +20,7 @@
     "mqtt": "^5.15.2",
     "pg": "^8.22.0",
     "prisma": "^7.9.1",
+    "socket.io": "^4.8.3",
     "zod": "^4.0.0"
   },
   "devDependencies": {
