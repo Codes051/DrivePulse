@@ -7,8 +7,13 @@ import express, {
 
 import { prisma } from "./lib/prisma.js";
 import { vehiclesRouter } from "./routes/vehicles.routes.js";
+import { telemetryRouter } from "./routes/telemetry.routes.js";
 
 export const app = express();
+
+app.set("json replacer", (_key: string, value: unknown) => {
+  return typeof value === "bigint" ? value.toString() : value;
+});
 
 app.disable("x-powered-by");
 
@@ -22,6 +27,7 @@ app.use(
 app.use(express.json());
 
 app.use("/api/vehicles", vehiclesRouter);
+app.use("/api/vehicles/:id/telemetry", telemetryRouter);
 
 app.get("/", (_request: Request, response: Response) => {
   response.status(200).json({
@@ -76,3 +82,5 @@ app.use(
     });
   },
 );
+
+
