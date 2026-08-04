@@ -1,6 +1,7 @@
 ﻿import { prisma } from "../lib/prisma.js";
 import { emitTelemetryUpdate } from "../realtime/socket.server.js";
 import type { TelemetryPayload } from "../schemas/telemetry.schema.js";
+import { evaluateTelemetryAlerts } from "./alert.service.js";
 
 export async function saveTelemetry(
   payload: TelemetryPayload,
@@ -21,32 +22,23 @@ export async function saveTelemetry(
     return;
   }
 
-  const [reading] = await prisma.$transaction([
-    prisma.telemetryReading.create({
-      data: {
-        vehicleId: vehicle.id,
-        recordedAt: new Date(payload.recordedAt),
-        speedKmh: payload.speedKmh,
-        rpm: payload.rpm,
-        temperatureC: payload.temperatureC,
-        batteryVoltage: payload.batteryVoltage,
-        batteryPercentage: payload.batteryPercentage,
-        currentAmps: payload.currentAmps,
-        vibration: payload.vibration,
-        latitude: payload.latitude,
-        longitude: payload.longitude,
-      },
-    }),
+  const reading = await prisma.telemetryReading.create({
+    data: {
+      vehicleId: vehicle.id,
+      recordedAt: new Date(payload.recordedAt),
+      speedKmh: payload.speedKmh,
+      rpm: payload.rpm,
+      temperatureC: payload.temperatureC,
+      batteryVoltage: payload.batteryVoltage,
+      batteryPercentage: payload.batteryPercentage,
+      currentAmps: payload.currentAmps,
+      vibration: payload.vibration,
+      latitude: payload.latitude,
+      longitude: payload.longitude,
+    },
+  });
 
-    prisma.vehicle.update({
-      where: {
-        id: vehicle.id,
-      },
-      data: {
-        status: "ONLINE",
-      },
-    }),
-  ]);
+  await evaluateTelemetryAlerts(vehicle.id, payload);
 
   emitTelemetryUpdate({
     id: reading.id.toString(),

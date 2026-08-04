@@ -24,6 +24,7 @@ model Vehicle {
   updatedAt    DateTime      @updatedAt
 
   telemetryReadings TelemetryReading[]
+  alerts            Alert[]
 }
 
 model TelemetryReading {
@@ -44,4 +45,45 @@ model TelemetryReading {
 
   @@index([vehicleId, recordedAt])
   @@index([recordedAt])
+}
+
+enum AlertType {
+  HIGH_TEMPERATURE
+  LOW_BATTERY_VOLTAGE
+  LOW_BATTERY_PERCENTAGE
+  EXCESSIVE_VIBRATION
+  TELEMETRY_MISSING
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+model Alert {
+  id             String        @id @default(uuid())
+  vehicleId      String
+  type           AlertType
+  severity       AlertSeverity
+  status         AlertStatus   @default(ACTIVE)
+  message        String
+  triggeredAt    DateTime      @default(now())
+  lastObservedAt DateTime      @default(now())
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, status])
+  @@index([status, severity])
+  @@index([triggeredAt])
 }

@@ -9,6 +9,8 @@ import { prisma } from "./lib/prisma.js";
 import { vehiclesRouter } from "./routes/vehicles.routes.js";
 import { telemetryRouter } from "./routes/telemetry.routes.js";
 
+import { alertRouter } from "./routes/alert.routes.js";
+
 export const app = express();
 
 app.set("json replacer", (_key: string, value: unknown) => {
@@ -61,6 +63,8 @@ app.get(
     }
   },
 );
+
+app.use("/api/alerts", alertRouter);
 
 app.use((_request: Request, response: Response) => {
   response.status(404).json({
