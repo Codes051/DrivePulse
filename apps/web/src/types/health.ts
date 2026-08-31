@@ -9,6 +9,7 @@ export interface VehicleHealth {
   score: number;
   condition: HealthCondition;
   calculatedAt: string;
+
   factors: {
     temperaturePenalty: number;
     vibrationPenalty: number;
@@ -16,5 +17,17 @@ export interface VehicleHealth {
     batteryPercentagePenalty: number;
     alertPenalty: number;
     telemetryFreshnessPenalty: number;
+    trendPenalty: number;
+  };
+
+  trends: {
+    sampleCount: number;
+    windowMinutes: number;
+    temperatureChangeC: number;
+    vibrationChange: number;
+    batteryVoltageChange: number;
+    temperatureRatePerMinute: number;
+    vibrationRatePerMinute: number;
+    batteryVoltageRatePerMinute: number;
   };
 }

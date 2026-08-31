@@ -651,6 +651,116 @@ export function VehicleDetailsPage() {
                     -{health.factors.telemetryFreshnessPenalty}
                   </strong>
                 </article>
+
+                <article>
+                  <span>Trend risk</span>
+                  <strong>
+                    -{health.factors.trendPenalty}
+                  </strong>
+                </article>
+              </div>
+
+              <div className="health-trends">
+                <div className="health-trends-header">
+                  <div>
+                    <p className="health-label">
+                      Recent telemetry trends
+                    </p>
+
+                    <span>
+                      Based on {health.trends.sampleCount} recent
+                      readings over{" "}
+                      {formatNumber(
+                        health.trends.windowMinutes,
+                        2,
+                      )}{" "}
+                      minutes
+                    </span>
+                  </div>
+
+                  <strong>
+                    Trend penalty: -{health.factors.trendPenalty}
+                  </strong>
+                </div>
+
+                <div className="health-trend-grid">
+                  <article>
+                    <span>Temperature trend</span>
+
+                    <strong>
+                      {health.trends.temperatureChangeC > 0
+                        ? "+"
+                        : ""}
+                      {formatNumber(
+                        health.trends.temperatureChangeC,
+                        2,
+                      )}{" "}
+                      {"\u00B0C"}
+                    </strong>
+
+                    <small>
+                      {health.trends.temperatureRatePerMinute > 0
+                        ? "+"
+                        : ""}
+                      {formatNumber(
+                        health.trends.temperatureRatePerMinute,
+                        2,
+                      )}{" "}
+                      {"\u00B0C"}/min
+                    </small>
+                  </article>
+
+                  <article>
+                    <span>Vibration trend</span>
+
+                    <strong>
+                      {health.trends.vibrationChange > 0
+                        ? "+"
+                        : ""}
+                      {formatNumber(
+                        health.trends.vibrationChange,
+                        3,
+                      )}
+                    </strong>
+
+                    <small>
+                      {health.trends.vibrationRatePerMinute > 0
+                        ? "+"
+                        : ""}
+                      {formatNumber(
+                        health.trends.vibrationRatePerMinute,
+                        3,
+                      )}{" "}
+                      /min
+                    </small>
+                  </article>
+
+                  <article>
+                    <span>Battery voltage trend</span>
+
+                    <strong>
+                      {health.trends.batteryVoltageChange > 0
+                        ? "+"
+                        : ""}
+                      {formatNumber(
+                        health.trends.batteryVoltageChange,
+                        2,
+                      )}{" "}
+                      V
+                    </strong>
+
+                    <small>
+                      {health.trends.batteryVoltageRatePerMinute > 0
+                        ? "+"
+                        : ""}
+                      {formatNumber(
+                        health.trends.batteryVoltageRatePerMinute,
+                        3,
+                      )}{" "}
+                      V/min
+                    </small>
+                  </article>
+                </div>
               </div>
             </section>
           )}
