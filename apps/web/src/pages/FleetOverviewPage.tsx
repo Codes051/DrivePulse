@@ -1,8 +1,9 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 
 import { acknowledgeAlert, getAlerts } from "../api/alerts";
 import { fetchVehicles } from "../api";
+import { socket } from "../socket";
 import type { VehicleAlert } from "../types/alert";
 import type { Vehicle, VehicleStatus } from "../types";
 
@@ -131,6 +132,51 @@ export function FleetOverviewPage() {
     [alerts],
   );
 
+  useEffect(() => {
+    function handleFleetAlertChange(): void {
+      void loadDashboard();
+    }
+
+    socket.connect();
+    socket.emit("fleet:join");
+
+    socket.on(
+      "alert:created",
+      handleFleetAlertChange,
+    );
+
+    socket.on(
+      "alert:updated",
+      handleFleetAlertChange,
+    );
+
+    socket.on(
+      "alert:resolved",
+      handleFleetAlertChange,
+    );
+
+    return () => {
+      socket.emit("fleet:leave");
+
+      socket.off(
+        "alert:created",
+        handleFleetAlertChange,
+      );
+
+      socket.off(
+        "alert:updated",
+        handleFleetAlertChange,
+      );
+
+      socket.off(
+        "alert:resolved",
+        handleFleetAlertChange,
+      );
+
+      socket.disconnect();
+    };
+  }, []);
+
   const statistics = useMemo(() => {
     return {
       total: vehicles.length,
@@ -179,13 +225,12 @@ export function FleetOverviewPage() {
             Vehicle Analytics
           </button>
 
-          <button
-            className="nav-item"
-            type="button"
-            disabled
+          <Link
+            className="nav-item nav-link"
+            to="/alerts"
           >
             Alerts
-          </button>
+          </Link>
 
           <button
             className="nav-item"

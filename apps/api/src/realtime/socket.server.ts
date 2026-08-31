@@ -9,13 +9,42 @@ export interface LiveTelemetryEvent extends TelemetryPayload {
   vehicleId: string;
 }
 
+export interface LiveAlertEvent {
+  id: string;
+  vehicleId: string;
+  type:
+    | "HIGH_TEMPERATURE"
+    | "LOW_BATTERY_VOLTAGE"
+    | "LOW_BATTERY_PERCENTAGE"
+    | "EXCESSIVE_VIBRATION"
+    | "TELEMETRY_MISSING";
+  severity:
+    | "INFO"
+    | "WARNING"
+    | "CRITICAL";
+  status:
+    | "ACTIVE"
+    | "ACKNOWLEDGED"
+    | "RESOLVED";
+  message: string;
+  triggeredAt: string;
+  lastObservedAt: string;
+  acknowledgedAt: string | null;
+  resolvedAt: string | null;
+}
+
 interface ServerToClientEvents {
   "telemetry:updated": (reading: LiveTelemetryEvent) => void;
+  "alert:created": (alert: LiveAlertEvent) => void;
+  "alert:updated": (alert: LiveAlertEvent) => void;
+  "alert:resolved": (alert: LiveAlertEvent) => void;
 }
 
 interface ClientToServerEvents {
   "vehicle:join": (vehicleId: string) => void;
   "vehicle:leave": (vehicleId: string) => void;
+  "fleet:join": () => void;
+  "fleet:leave": () => void;
 }
 
 let io:
@@ -62,6 +91,18 @@ export function startSocketServer(
       void socket.leave(`vehicle:${vehicleId}`);
     });
 
+    socket.on("fleet:join", () => {
+      void socket.join("fleet");
+
+      console.log(
+        `Dashboard ${socket.id} joined fleet`,
+      );
+    });
+
+    socket.on("fleet:leave", () => {
+      void socket.leave("fleet");
+    });
+
     socket.on("disconnect", () => {
       console.log(`Dashboard disconnected: ${socket.id}`);
     });
@@ -76,6 +117,33 @@ export function emitTelemetryUpdate(
   io
     ?.to(`vehicle:${reading.vehicleId}`)
     .emit("telemetry:updated", reading);
+}
+
+export function emitAlertCreated(
+  alert: LiveAlertEvent,
+): void {
+  io
+    ?.to("fleet")
+    .to(`vehicle:${alert.vehicleId}`)
+    .emit("alert:created", alert);
+}
+
+export function emitAlertUpdated(
+  alert: LiveAlertEvent,
+): void {
+  io
+    ?.to("fleet")
+    .to(`vehicle:${alert.vehicleId}`)
+    .emit("alert:updated", alert);
+}
+
+export function emitAlertResolved(
+  alert: LiveAlertEvent,
+): void {
+  io
+    ?.to("fleet")
+    .to(`vehicle:${alert.vehicleId}`)
+    .emit("alert:resolved", alert);
 }
 
 export async function stopSocketServer(): Promise<void> {

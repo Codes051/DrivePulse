@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "drivepulse",
   "version": "1.0.0",
   "private": true,
@@ -9,8 +9,11 @@
     "packages/shared-types"
   ],
   "scripts": {
+    "dev": "concurrently -n API,WEB -c auto \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "npm run dev --workspace=@drivepulse/api",
     "dev:web": "npm run dev --workspace=@drivepulse/web",
+    "simulator": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& '.\\apps\\simulator\\.venv\\Scripts\\python.exe' '.\\apps\\simulator\\simulator.py'\"",
+    "fault:temperature": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& '.\\apps\\simulator\\.venv\\Scripts\\python.exe' '.\\apps\\simulator\\high_temperature_test.py'\"",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
   }

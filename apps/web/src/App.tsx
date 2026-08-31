@@ -1,8 +1,9 @@
-﻿import { Route, Routes } from "react-router";
+import { Route, Routes } from "react-router";
 
 import "./App.css";
 import { FleetOverviewPage } from "./pages/FleetOverviewPage";
 import { VehicleDetailsPage } from "./pages/VehicleDetailsPage";
+import { AlertsPage } from "./pages/AlertsPage";
 
 function App() {
   return (
@@ -20,7 +21,11 @@ function App() {
           </main>
         }
       />
-    </Routes>
+          <Route
+        path="/alerts"
+        element={<AlertsPage />}
+      />
+</Routes>
   );
 }
 

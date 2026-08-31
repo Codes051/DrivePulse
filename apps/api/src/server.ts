@@ -12,8 +12,13 @@ import {
   startSocketServer,
   stopSocketServer,
 } from "./realtime/socket.server.js";
+import {
+  checkTelemetryTimeouts,
+} from "./services/telemetry-watchdog.service.js";
 
 const portValue = Number(process.env.PORT ?? 3000);
+
+const WATCHDOG_INTERVAL_MS = 5_000;
 
 if (
   !Number.isInteger(portValue) ||
@@ -30,9 +35,30 @@ const httpServer = createServer(app);
 startSocketServer(httpServer);
 startMqttClient();
 
+async function runTelemetryWatchdog(): Promise<void> {
+  try {
+    await checkTelemetryTimeouts();
+  } catch (error) {
+    console.error(
+      "Telemetry watchdog check failed:",
+      error,
+    );
+  }
+}
+
+const watchdogTimer = setInterval(() => {
+  void runTelemetryWatchdog();
+}, WATCHDOG_INTERVAL_MS);
+
+void runTelemetryWatchdog();
+
 httpServer.listen(portValue, () => {
   console.log(
     `DrivePulse API running at http://localhost:${portValue}`,
+  );
+
+  console.log(
+    "Telemetry watchdog active: 30 second timeout.",
   );
 });
 
@@ -45,11 +71,19 @@ async function shutDown(signal: string): Promise<void> {
 
   isShuttingDown = true;
 
-  console.log(`\nReceived ${signal}. Shutting down...`);
+  console.log(
+    `\nReceived ${signal}. Shutting down...`,
+  );
+
+  clearInterval(watchdogTimer);
 
   httpServer.close(async (error) => {
     if (error) {
-      console.error("Failed to close the HTTP server:", error);
+      console.error(
+        "Failed to close the HTTP server:",
+        error,
+      );
+
       process.exit(1);
     }
 
@@ -58,11 +92,23 @@ async function shutDown(signal: string): Promise<void> {
       await stopSocketServer();
       await prisma.$disconnect();
 
-      console.log("Database connection closed.");
-      console.log("HTTP server closed.");
+      console.log(
+        "Telemetry watchdog stopped.",
+      );
+      console.log(
+        "Database connection closed.",
+      );
+      console.log(
+        "HTTP server closed.",
+      );
+
       process.exit(0);
     } catch (shutdownError) {
-      console.error("Shutdown failed:", shutdownError);
+      console.error(
+        "Shutdown failed:",
+        shutdownError,
+      );
+
       process.exit(1);
     }
   });

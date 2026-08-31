@@ -11,6 +11,8 @@ import { telemetryRouter } from "./routes/telemetry.routes.js";
 
 import { alertRouter } from "./routes/alert.routes.js";
 
+import { healthRouter } from "./routes/health.routes.js";
+
 export const app = express();
 
 app.set("json replacer", (_key: string, value: unknown) => {
@@ -65,6 +67,8 @@ app.get(
 );
 
 app.use("/api/alerts", alertRouter);
+
+app.use("/api/vehicles", healthRouter);
 
 app.use((_request: Request, response: Response) => {
   response.status(404).json({
