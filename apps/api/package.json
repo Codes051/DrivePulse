@@ -9,7 +9,9 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
@@ -29,6 +31,7 @@
     "@types/node": "^24.0.0",
     "@types/pg": "^8.20.0",
     "tsx": "^4.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.11"
   }
 }

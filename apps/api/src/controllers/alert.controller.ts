@@ -1,5 +1,11 @@
 ﻿import type { Request, Response } from "express";
+import type { Alert } from "../generated/prisma/client.js";
+
 import { prisma } from "../lib/prisma.js";
+import {
+  emitAlertUpdated,
+  type LiveAlertEvent,
+} from "../realtime/socket.server.js";
 
 const validStatuses = [
   "ACTIVE",
@@ -11,6 +17,23 @@ type AlertStatusFilter = (typeof validStatuses)[number];
 
 function isAlertStatus(value: string): value is AlertStatusFilter {
   return validStatuses.includes(value as AlertStatusFilter);
+}
+
+function toLiveAlertEvent(alert: Alert): LiveAlertEvent {
+  return {
+    id: alert.id,
+    vehicleId: alert.vehicleId,
+    type: alert.type,
+    severity: alert.severity,
+    status: alert.status,
+    message: alert.message,
+    triggeredAt: alert.triggeredAt.toISOString(),
+    lastObservedAt: alert.lastObservedAt.toISOString(),
+    acknowledgedAt:
+      alert.acknowledgedAt?.toISOString() ?? null,
+    resolvedAt:
+      alert.resolvedAt?.toISOString() ?? null,
+  };
 }
 
 export async function getAlerts(
@@ -86,6 +109,11 @@ export async function acknowledgeAlert(
     return;
   }
 
+  if (alert.status === "ACKNOWLEDGED") {
+    response.json(alert);
+    return;
+  }
+
   const updatedAlert = await prisma.alert.update({
     where: {
       id: alert.id,
@@ -95,6 +123,10 @@ export async function acknowledgeAlert(
       acknowledgedAt: new Date(),
     },
   });
+
+  emitAlertUpdated(
+    toLiveAlertEvent(updatedAlert),
+  );
 
   response.json(updatedAlert);
 }
