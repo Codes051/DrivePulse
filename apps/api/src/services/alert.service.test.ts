@@ -1,4 +1,4 @@
-﻿import {
+import {
   beforeEach,
   describe,
   expect,
@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   emitCreated: vi.fn(),
   emitUpdated: vi.fn(),
   emitResolved: vi.fn(),
+  createMaintenanceRecommendation: vi.fn(),
 }));
 
 vi.mock("../lib/prisma.js", () => ({
@@ -35,6 +36,11 @@ vi.mock("../realtime/socket.server.js", () => ({
   emitAlertCreated: mocks.emitCreated,
   emitAlertUpdated: mocks.emitUpdated,
   emitAlertResolved: mocks.emitResolved,
+}));
+
+vi.mock("./maintenance.service.js", () => ({
+  createMaintenanceRecommendationFromAlert:
+    mocks.createMaintenanceRecommendation,
 }));
 
 import {
@@ -110,6 +116,20 @@ describe("evaluateTelemetryAlerts", () => {
     });
 
     expect(mocks.emitCreated).toHaveBeenCalledTimes(1);
+
+    expect(
+      mocks.createMaintenanceRecommendation,
+    ).toHaveBeenCalledTimes(1);
+
+    expect(
+      mocks.createMaintenanceRecommendation,
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "alert-1",
+        type: "HIGH_TEMPERATURE",
+        severity: "CRITICAL",
+      }),
+    );
   });
 
   it("updates an existing alert instead of creating a duplicate", async () => {

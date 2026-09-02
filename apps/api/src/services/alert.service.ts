@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   Alert,
   AlertSeverity,
   AlertType,
@@ -11,6 +11,9 @@ import {
   type LiveAlertEvent,
 } from "../realtime/socket.server.js";
 import type { TelemetryPayload } from "../schemas/telemetry.schema.js";
+import {
+  createMaintenanceRecommendationFromAlert,
+} from "./maintenance.service.js";
 
 interface AlertRule {
   type: AlertType;
@@ -142,6 +145,10 @@ export async function evaluateTelemetryAlerts(
               lastObservedAt: observedAt,
             },
           });
+
+        await createMaintenanceRecommendationFromAlert(
+          createdAlert,
+        );
 
         pendingEvents.push({
           event: "created",

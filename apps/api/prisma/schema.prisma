@@ -6,6 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 enum VehicleStatus {
   ONLINE
   OFFLINE
@@ -23,8 +24,9 @@ model Vehicle {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  telemetryReadings TelemetryReading[]
-  alerts            Alert[]
+  telemetryReadings          TelemetryReading[]
+  alerts                     Alert[]
+  maintenanceRecommendations MaintenanceRecommendation[]
 }
 
 model TelemetryReading {
@@ -40,8 +42,7 @@ model TelemetryReading {
   vibration         Float
   latitude          Float?
   longitude         Float?
-
-  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  vehicle           Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
   @@index([vehicleId, recordedAt])
   @@index([recordedAt])
@@ -80,10 +81,50 @@ model Alert {
   resolvedAt     DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-
-  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  vehicle        Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
   @@index([vehicleId, status])
   @@index([status, severity])
   @@index([triggeredAt])
+}
+
+enum MaintenanceType {
+  COOLING_SYSTEM
+  BATTERY_SYSTEM
+  VIBRATION_INSPECTION
+  TELEMETRY_SYSTEM
+  GENERAL_INSPECTION
+}
+
+enum MaintenancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MaintenanceStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  DISMISSED
+}
+
+model MaintenanceRecommendation {
+  id          String              @id @default(uuid())
+  vehicleId   String
+  type        MaintenanceType
+  priority    MaintenancePriority
+  status      MaintenanceStatus   @default(OPEN)
+  title       String
+  description String
+  reason      String
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  completedAt DateTime?
+  vehicle     Vehicle             @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, status])
+  @@index([priority, status])
+  @@index([createdAt])
 }

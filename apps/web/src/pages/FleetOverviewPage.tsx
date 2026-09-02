@@ -232,13 +232,12 @@ export function FleetOverviewPage() {
             Alerts
           </Link>
 
-          <button
-            className="nav-item"
-            type="button"
-            disabled
+          <Link
+            className="nav-item nav-link"
+            to="/maintenance"
           >
             Maintenance
-          </button>
+          </Link>
         </nav>
 
         <div className="sidebar-footer">

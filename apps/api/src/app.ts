@@ -12,6 +12,7 @@ import { telemetryRouter } from "./routes/telemetry.routes.js";
 import { alertRouter } from "./routes/alert.routes.js";
 
 import { healthRouter } from "./routes/health.routes.js";
+import { maintenanceRouter } from "./routes/maintenance.routes.js";
 
 export const app = express();
 
@@ -67,6 +68,7 @@ app.get(
 );
 
 app.use("/api/alerts", alertRouter);
+app.use("/api/maintenance", maintenanceRouter);
 
 app.use("/api/vehicles", healthRouter);
 

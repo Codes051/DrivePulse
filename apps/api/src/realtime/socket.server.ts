@@ -1,4 +1,4 @@
-﻿import type { Server as HttpServer } from "node:http";
+import type { Server as HttpServer } from "node:http";
 
 import { Server as SocketServer } from "socket.io";
 
@@ -33,11 +33,44 @@ export interface LiveAlertEvent {
   resolvedAt: string | null;
 }
 
+export interface LiveMaintenanceEvent {
+  id: string;
+  vehicleId: string;
+  type:
+    | "COOLING_SYSTEM"
+    | "BATTERY_SYSTEM"
+    | "VIBRATION_INSPECTION"
+    | "TELEMETRY_SYSTEM"
+    | "GENERAL_INSPECTION";
+  priority:
+    | "LOW"
+    | "MEDIUM"
+    | "HIGH"
+    | "CRITICAL";
+  status:
+    | "OPEN"
+    | "IN_PROGRESS"
+    | "COMPLETED"
+    | "DISMISSED";
+  title: string;
+  description: string;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+}
+
 interface ServerToClientEvents {
   "telemetry:updated": (reading: LiveTelemetryEvent) => void;
   "alert:created": (alert: LiveAlertEvent) => void;
   "alert:updated": (alert: LiveAlertEvent) => void;
   "alert:resolved": (alert: LiveAlertEvent) => void;
+  "maintenance:created": (
+    recommendation: LiveMaintenanceEvent,
+  ) => void;
+  "maintenance:updated": (
+    recommendation: LiveMaintenanceEvent,
+  ) => void;
 }
 
 interface ClientToServerEvents {
@@ -144,6 +177,30 @@ export function emitAlertResolved(
     ?.to("fleet")
     .to(`vehicle:${alert.vehicleId}`)
     .emit("alert:resolved", alert);
+}
+
+export function emitMaintenanceCreated(
+  recommendation: LiveMaintenanceEvent,
+): void {
+  io
+    ?.to("fleet")
+    .to(`vehicle:${recommendation.vehicleId}`)
+    .emit(
+      "maintenance:created",
+      recommendation,
+    );
+}
+
+export function emitMaintenanceUpdated(
+  recommendation: LiveMaintenanceEvent,
+): void {
+  io
+    ?.to("fleet")
+    .to(`vehicle:${recommendation.vehicleId}`)
+    .emit(
+      "maintenance:updated",
+      recommendation,
+    );
 }
 
 export async function stopSocketServer(): Promise<void> {

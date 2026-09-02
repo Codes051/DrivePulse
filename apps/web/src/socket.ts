@@ -1,4 +1,4 @@
-﻿import { io } from "socket.io-client";
+import { io } from "socket.io-client";
 
 const socketUrl =
   import.meta.env.VITE_API_URL ?? "http://localhost:3000";
@@ -25,6 +25,33 @@ export interface LiveAlertEvent {
   lastObservedAt: string;
   acknowledgedAt: string | null;
   resolvedAt: string | null;
+}
+
+export interface LiveMaintenanceEvent {
+  id: string;
+  vehicleId: string;
+  type:
+    | "COOLING_SYSTEM"
+    | "BATTERY_SYSTEM"
+    | "VIBRATION_INSPECTION"
+    | "TELEMETRY_SYSTEM"
+    | "GENERAL_INSPECTION";
+  priority:
+    | "LOW"
+    | "MEDIUM"
+    | "HIGH"
+    | "CRITICAL";
+  status:
+    | "OPEN"
+    | "IN_PROGRESS"
+    | "COMPLETED"
+    | "DISMISSED";
+  title: string;
+  description: string;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
 }
 
 export const socket = io(socketUrl, {
