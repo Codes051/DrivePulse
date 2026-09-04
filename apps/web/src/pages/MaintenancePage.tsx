@@ -75,7 +75,7 @@ export function MaintenancePage() {
       setErrorMessage(null);
 
       const response = await fetch(
-        "http://localhost:3000/api/maintenance",
+        `${import.meta.env.VITE_API_URL ?? "http://localhost:3000"}/api/maintenance`,
       );
 
       if (!response.ok) {
@@ -108,7 +108,7 @@ export function MaintenancePage() {
       setErrorMessage(null);
 
       const response = await fetch(
-        `http://localhost:3000/api/maintenance/${id}/status`,
+        `${import.meta.env.VITE_API_URL ?? "http://localhost:3000"}/api/maintenance/${id}/status`,
         {
           method: "PATCH",
           headers: {
