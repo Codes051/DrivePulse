@@ -6,16 +6,17 @@ import threading
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import os
 from urllib.parse import unquote
 
 import paho.mqtt.client as mqtt
 
 
-MQTT_HOST = "127.0.0.1"
-MQTT_PORT = 1883
+MQTT_HOST = os.getenv("MQTT_HOST", "127.0.0.1")
+MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
 
-HTTP_HOST = "127.0.0.1"
-HTTP_PORT = 3010
+HTTP_HOST = os.getenv("HTTP_HOST", "127.0.0.1")
+HTTP_PORT = int(os.getenv("HTTP_PORT", "3010"))
 
 PUBLISH_INTERVAL_SECONDS = 2
 
