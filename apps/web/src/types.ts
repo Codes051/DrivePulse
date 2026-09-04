@@ -1,4 +1,4 @@
-﻿export type VehicleStatus =
+export type VehicleStatus =
   | "ONLINE"
   | "OFFLINE"
   | "WARNING"
@@ -50,4 +50,16 @@ export interface TelemetryHistoryResponse {
   >;
   count: number;
   telemetry: TelemetryReading[];
+}
+
+export interface CreateVehicleInput {
+  vehicleCode: string;
+  manufacturer: string;
+  model: string;
+  year?: number;
+}
+
+export interface CreateVehicleResponse {
+  message: string;
+  vehicle: Vehicle;
 }

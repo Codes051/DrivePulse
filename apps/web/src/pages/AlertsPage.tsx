@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 
 import {
@@ -209,7 +209,7 @@ export function AlertsPage() {
   ).length;
 
   return (
-    <main className="alerts-page">
+    <div className="alerts-page">
       <Link className="back-link" to="/">
         {"\u2190"} Fleet overview
       </Link>
@@ -489,6 +489,6 @@ export function AlertsPage() {
           </div>
         )}
       </section>
-    </main>
+    </div>
   );
 }

@@ -1,20 +1,25 @@
 {
-  "name": "drivepulse",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Connected vehicle telemetry and predictive maintenance platform",
-  "workspaces": [
-    "apps/api",
-    "apps/web",
-    "packages/shared-types"
-  ],
-  "scripts": {
-    "dev": "concurrently -n API,WEB -c auto \"npm run dev:api\" \"npm run dev:web\"",
-    "dev:api": "npm run dev --workspace=@drivepulse/api",
-    "dev:web": "npm run dev --workspace=@drivepulse/web",
-    "simulator": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& '.\\apps\\simulator\\.venv\\Scripts\\python.exe' '.\\apps\\simulator\\simulator.py'\"",
-    "fault:temperature": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& '.\\apps\\simulator\\.venv\\Scripts\\python.exe' '.\\apps\\simulator\\high_temperature_test.py'\"",
-    "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
-  }
+    "name": "drivepulse",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Connected vehicle telemetry and predictive maintenance platform",
+    "workspaces": [
+        "apps/api",
+        "apps/web",
+        "packages/shared-types"
+    ],
+    "scripts": {
+        "dev": "concurrently -n API,WEB,SIM -c auto \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:simulator\"",
+        "dev:api": "npm run dev --workspace=@drivepulse/api",
+        "dev:web": "npm run dev --workspace=@drivepulse/web",
+        "simulator": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& '.\\apps\\simulator\\.venv\\Scripts\\python.exe' '.\\apps\\simulator\\simulator.py'\"",
+        "fault:temperature": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& '.\\apps\\simulator\\.venv\\Scripts\\python.exe' '.\\apps\\simulator\\high_temperature_test.py'\"",
+        "build": "npm run build --workspaces --if-present",
+        "test": "npm run test --workspaces --if-present",
+        "dev:simulator": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& '.\\apps\\simulator\\.venv\\Scripts\\python.exe' '.\\apps\\simulator\\service.py'\"",
+        "demo": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\demo.ps1"
+    },
+    "devDependencies": {
+        "concurrently": "^10.0.5"
+    }
 }

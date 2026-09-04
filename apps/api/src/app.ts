@@ -13,6 +13,7 @@ import { alertRouter } from "./routes/alert.routes.js";
 
 import { healthRouter } from "./routes/health.routes.js";
 import { maintenanceRouter } from "./routes/maintenance.routes.js";
+import { simulationRouter } from "./routes/simulation.routes.js";
 
 export const app = express();
 
@@ -69,6 +70,7 @@ app.get(
 
 app.use("/api/alerts", alertRouter);
 app.use("/api/maintenance", maintenanceRouter);
+app.use("/api/simulation", simulationRouter);
 
 app.use("/api/vehicles", healthRouter);
 

@@ -1,6 +1,9 @@
-﻿import type {
+import type {
+  CreateVehicleInput,
+  CreateVehicleResponse,
   LatestTelemetryResponse,
   TelemetryHistoryResponse,
+  Vehicle,
   VehiclesResponse,
 } from "./types";
 
@@ -40,6 +43,60 @@ export function fetchVehicles(
     "/api/vehicles",
     signal,
   );
+}
+
+export async function createVehicle(
+  input: CreateVehicleInput,
+): Promise<Vehicle> {
+  const response = await fetch(
+    `${apiUrl}/api/vehicles`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    },
+  );
+
+  const data = (await response
+    .json()
+    .catch(() => null)) as
+    | CreateVehicleResponse
+    | {
+        error?: string;
+        details?: Array<{
+          field: string;
+          message: string;
+        }>;
+      }
+    | null;
+
+  if (!response.ok) {
+    const validationMessage =
+      data &&
+      "details" in data &&
+      data.details?.length
+        ? data.details
+            .map((issue) => issue.message)
+            .join(" ")
+        : null;
+
+    const errorMessage =
+      data &&
+      "error" in data
+        ? data.error
+        : null;
+
+    throw new Error(
+      validationMessage ??
+        errorMessage ??
+        `Request failed with status ${response.status}.`,
+    );
+  }
+
+  return (data as CreateVehicleResponse).vehicle;
 }
 
 export function fetchLatestTelemetry(

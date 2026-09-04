@@ -41,6 +41,12 @@ function formatNumber(
   return value.toFixed(digits);
 }
 
+function formatPenalty(value: number): string {
+  return value === 0
+    ? "0"
+    : `-${value}`;
+}
+
 function formatTimestamp(value: string): string {
   return new Intl.DateTimeFormat("en-ZA", {
     dateStyle: "medium",
@@ -401,7 +407,7 @@ export function VehicleDetailsPage() {
 
   if (isLoading) {
     return (
-      <main className="details-page">
+      <div className="details-page">
         <Link className="back-link" to="/">
           {"\u2190"} Fleet overview
         </Link>
@@ -409,13 +415,13 @@ export function VehicleDetailsPage() {
         <div className="details-state">
           Loading vehicle telemetry...
         </div>
-      </main>
+      </div>
     );
   }
 
   if (errorMessage || !latest) {
     return (
-      <main className="details-page">
+      <div className="details-page">
         <Link className="back-link" to="/">
           {"\u2190"} Fleet overview
         </Link>
@@ -424,7 +430,7 @@ export function VehicleDetailsPage() {
           {errorMessage ??
             "Vehicle data could not be loaded."}
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -436,7 +442,7 @@ export function VehicleDetailsPage() {
       : latest.vehicle.status;
 
   return (
-    <main className="details-page">
+    <div className="details-page">
       <Link className="back-link" to="/">
         {"\u2190"} Fleet overview
       </Link>
@@ -613,49 +619,49 @@ export function VehicleDetailsPage() {
                 <article>
                   <span>Temperature</span>
                   <strong>
-                    -{health.factors.temperaturePenalty}
+                    {formatPenalty(health.factors.temperaturePenalty)}
                   </strong>
                 </article>
 
                 <article>
                   <span>Vibration</span>
                   <strong>
-                    -{health.factors.vibrationPenalty}
+                    {formatPenalty(health.factors.vibrationPenalty)}
                   </strong>
                 </article>
 
                 <article>
                   <span>Battery voltage</span>
                   <strong>
-                    -{health.factors.batteryVoltagePenalty}
+                    {formatPenalty(health.factors.batteryVoltagePenalty)}
                   </strong>
                 </article>
 
                 <article>
                   <span>Battery charge</span>
                   <strong>
-                    -{health.factors.batteryPercentagePenalty}
+                    {formatPenalty(health.factors.batteryPercentagePenalty)}
                   </strong>
                 </article>
 
                 <article>
                   <span>Active alerts</span>
                   <strong>
-                    -{health.factors.alertPenalty}
+                    {formatPenalty(health.factors.alertPenalty)}
                   </strong>
                 </article>
 
                 <article>
                   <span>Telemetry age</span>
                   <strong>
-                    -{health.factors.telemetryFreshnessPenalty}
+                    {formatPenalty(health.factors.telemetryFreshnessPenalty)}
                   </strong>
                 </article>
 
                 <article>
                   <span>Trend risk</span>
                   <strong>
-                    -{health.factors.trendPenalty}
+                    {formatPenalty(health.factors.trendPenalty)}
                   </strong>
                 </article>
               </div>
@@ -679,7 +685,7 @@ export function VehicleDetailsPage() {
                   </div>
 
                   <strong>
-                    Trend penalty: -{health.factors.trendPenalty}
+                    Trend penalty: {formatPenalty(health.factors.trendPenalty)}
                   </strong>
                 </div>
 
@@ -999,6 +1005,6 @@ export function VehicleDetailsPage() {
           </section>
         </>
       )}
-    </main>
+    </div>
   );
 }

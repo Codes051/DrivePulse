@@ -218,7 +218,7 @@ export function MaintenancePage() {
   ).length;
 
   return (
-    <main className="maintenance-page">
+    <div className="maintenance-page">
       <div className="page-header">
         <div>
           <p className="eyebrow">
@@ -450,6 +450,6 @@ export function MaintenancePage() {
           )}
         </section>
       )}
-    </main>
+    </div>
   );
 }
