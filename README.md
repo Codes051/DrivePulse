@@ -10,11 +10,11 @@
 
 ### Fleet Overview
 
-![Fleet Overview](docs/screenshots/Fleet Overview.png)
+![Fleet Overview](docs/screenshots/Fleet%20Overview.png)
 
 ### Simulation Lab
 
-![Simulation Lab](docs/screenshots/Simulation Lab.png)
+![Simulation Lab](docs/screenshots/Simulation%20Lab.png)
 
 <!-- SCREENSHOTS END -->
 
