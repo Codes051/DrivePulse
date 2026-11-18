@@ -1,5 +1,24 @@
 # DrivePulse
 
+<!-- SCREENSHOTS START -->
+
+## Application Screenshots
+
+### Analytics
+
+![Analytics](docs/screenshots/Analytics.png)
+
+### Fleet Overview
+
+![Fleet Overview](docs/screenshots/Fleet Overview.png)
+
+### Simulation Lab
+
+![Simulation Lab](docs/screenshots/Simulation Lab.png)
+
+<!-- SCREENSHOTS END -->
+
+
 ## Quick Start — GitHub Codespaces
 
 DrivePulse can run as a full-stack interactive demonstration in GitHub Codespaces.
