@@ -1,5 +1,69 @@
 # DrivePulse
 
+<!-- SCREENSHOTS START -->
+
+## Application Screenshots
+
+### Analytics
+
+![Analytics](docs/screenshots/Analytics.png)
+
+### Fleet Overview
+
+![Fleet Overview](docs/screenshots/Fleet%20Overview.png)
+
+### Simulation Lab
+
+![Simulation Lab](docs/screenshots/Simulation%20Lab.png)
+
+<!-- SCREENSHOTS END -->
+
+
+## Quick Start — GitHub Codespaces
+
+DrivePulse can run as a full-stack interactive demonstration in GitHub Codespaces.
+
+### Launch the demo
+
+1. Open this repository on GitHub.
+2. Select **Code → Codespaces**.
+3. Create a Codespace using the `feature/production-deployment` branch.
+4. Open the terminal and run:
+
+```bash
+./start-demo.sh
+```
+
+5. Open port **5173** using the Codespaces **Ports** tab.
+
+The launcher starts PostgreSQL, Mosquitto MQTT, the Express API,
+the Python simulation service and the React dashboard.
+
+### Suggested demo walkthrough
+
+1. Open Fleet Overview and inspect registered vehicles.
+2. Open Simulation Lab and select a vehicle.
+3. Start normal telemetry and observe the live readings.
+4. Trigger the High Temperature scenario.
+5. Inspect the resulting alert and vehicle health score.
+6. View historical telemetry in Vehicle Analytics.
+7. Review maintenance recommendations.
+8. Restore normal operation.
+
+### Important notes
+
+- This is a development demonstration, not a production deployment.
+- Simulated telemetry does not require physical vehicle hardware.
+- Keep Codespaces forwarded ports **Private** until access controls
+  and API security have been implemented.
+- Codespaces uses a monthly compute and storage allowance.
+- Stop the Codespace after your demonstration to conserve usage.
+- Press Ctrl+C to stop the application processes; Docker services
+  may continue until stopped separately.
+
+---
+
+
 **DrivePulse** is a full-stack connected-vehicle intelligence platform that simulates vehicle telemetry, processes it through an event-driven backend, detects abnormal operating conditions, evaluates vehicle health, and turns telemetry into maintenance information in real time.
 
 The project is designed as a software-engineering portfolio system rather than a simple CRUD application. It combines IoT-style messaging, real-time communication, telemetry analytics, fault simulation, background monitoring, system health checks, and a modern web interface.

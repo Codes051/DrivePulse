@@ -661,7 +661,7 @@ export function SimulationLabPage() {
                 {formatNumber(
                   telemetry.temperatureC,
                 )}{" "}
-                <small>Ã‚Â°C</small>
+                <small>{"\u00B0C"}</small>
               </strong>
             </article>
 
